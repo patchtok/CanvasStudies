@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>HTML 5 Canvas studies</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="Description" lang="en" content="ADD SITE DESCRIPTION">
+		<meta name="author" content="ADD AUTHOR INFORMATION">
+		<meta name="robots" content="index, follow">
+
+		<!-- icons -->
+		<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+		<link rel="shortcut icon" href="favicon.ico">
+
+		<!-- Override CSS file - add your own CSS rules -->
+		<link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body onload="loader()" onresize="reSizeCheck()" onscroll="reSizeCheck()">
+		<div class="header">
+			<div class="container">
+				<h1 class="header-heading">HTML 5 Canvas studies</h1>
+			</div>
+		</div>
+		<div class="nav-bar">
+			<div class="container">
+				<ul class="nav">
+					<li><a href="index.html">Basic set up</a></li>
+					<li><a href="animation1.html">Simple animations</a></li>
+					<li><a href="animation2.html">Unit circle</a></li>
+					<li><a href="mouseTrackingSet.html">Mouse Tracking</a></li>
+                    <li><a href="roundDrag.html">Circular Dragging</a></li>
+                    <li><a href="multMouseCircles.html">Multiple Circles with Tracking</a></li>
+                    <li><a href="movingObjects.html">Moving multiple objects</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="content">
+			<div class="container">
+				<div id="mn" class="main">
+					<h1>Canvas set-up</h1>
+					<hr>
+
+					<!-- Canvas -->
+					<canvas id="myCanvas"> </canvas>
+					<hr>
+<script>
+    //to be updated
+    var width=0;
+    var height=0;
+    var cLeft=0;
+    var cTop=0;
+    var cRight=0;
+    var cBottom=0;
+    var xPos=0;
+    var yPos=0;
+    var positionString="";
+    
+    var canvas=document.getElementById("myCanvas");
+    var ctx=canvas.getContext("2d");
+    
+    //--
+    function loader(){
+    reSizeCheck();
+    drawGrid(); 
+    }
+    function reSizeCheck(){
+        var rect=canvas.getBoundingClientRect();
+        cLeft=rect.left;
+        cTop=rect.top;
+        cRight=rect.right;
+        cBottom=rect.bottom;
+        positionString="Left: "+cLeft+" Top: "+cTop+" Right: "+cRight+" Bottom: "+cBottom;
+        document.getElementById("out1").innerHTML=positionString;
+        width=10*Math.floor(document.getElementById("mn").offsetWidth/10);
+        height=0.75*width;
+        canvas.width=width;
+        canvas.height=height;
+        drawGrid();
+        document.getElementById("out2").innerHTML="Width: "+width+" Height: "+height;
+   
+    }
+    //--
+    function drawGrid(){
+        ctx.fillStyle="#abdfee";
+        ctx.fillRect(0,0,width,height);
+        for(i=1;i<=9;i++){
+            var xcPos=(i/10)*width;
+            var ycPos=(i/10)*height;
+            ctx.fillStyle="#eeeeee";
+            ctx.fillRect(xcPos,0,1,height);
+            ctx.fillRect(0,ycPos,width,1);
+        }
+    }
+    
+    var count=0;
+    setInterval(go,10);
+    function go(){
+        count=count+1;
+        document.getElementById("out3").innerHTML="Count="+count;
+    }
+    //-- 
+</script>
+
+					<!-- Code -->
+					<p> Code snippets</p>
+                    <code>
+        function reSizeCheck(){ <br>               
+        var rect=canvas.getBoundingClientRect();<br>
+        cLeft=rect.left;<br>
+        cTop=rect.top;<br>
+        cRight=rect.right;<br>
+        cBottom=rect.bottom;<br>
+        positionString="Left: "+cLeft+" Top: "+cTop+" Right: "+cRight+" Bottom: "+cBottom;<br>
+        document.getElementById("out1").innerHTML=positionString;<br>
+        width=10*Math.floor(document.getElementById("mn").offsetWidth/10);<br>
+        height=0.75*width;<br>
+        canvas.width=width;<br>
+        canvas.height=height;<br>
+        drawGrid();<br>
+        document.getElementById("out2").innerHTML="Width: "+width+" Height: "+height;<br>
+                        }<br>
+                    </code>
+                    <code>
+                          function drawGrid(){<br>
+        ctx.fillStyle="#abdfee";<br>
+        ctx.fillRect(0,0,width,height);<br>
+        for(i=1;i&lt=9;i++){<br>
+            var xcPos=(i/10)*width;<br>
+            var ycPos=(i/10)*height;<br>
+            ctx.fillStyle="#eeeeee";<br>
+            ctx.fillRect(xcPos,0,1,height);<br>
+            ctx.fillRect(0,ycPos,width,1);<br>
+        }
+    }
+                    
+                    </code>
+					<hr>
+
+					<!-- Responsive images -->
+					
+
+			
+
+			
+				</div>
+				<div class="aside">
+					<h3>Data Output</h3>
+					<p id="out1"> </p>
+                    <p id="out2"> </p>
+                    <p id="out3"> </p>
+				</div>
+			</div>
+		</div>
+		<div class="footer">
+			<div class="container">
+				&copy; Copyright 2015
+			</div>
+		</div>
+	</body>
+</html>

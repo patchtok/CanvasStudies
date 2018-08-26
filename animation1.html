@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>HTML 5 Canvas studies - animation 1</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="Description" lang="en" content="ADD SITE DESCRIPTION">
+		<meta name="author" content="ADD AUTHOR INFORMATION">
+		<meta name="robots" content="index, follow">
+
+		<!-- icons -->
+		<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+		<link rel="shortcut icon" href="favicon.ico">
+
+		<!-- Override CSS file - add your own CSS rules -->
+		<link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body onload="loader()" onresize="reSizeCheck()" onscroll="reSizeCheck()">
+		<div class="header">
+			<div class="container">
+				<h1 class="header-heading">HTML 5 Canvas studies</h1>
+			</div>
+		</div>
+		<div class="nav-bar">
+			<div class="container">
+				<ul class="nav">
+					<li><a href="index.html">Basic set up</a></li>
+					<li><a href="animation1.html">Simple animations</a></li>
+					<li><a href="animation2.html">Unit circle</a></li>
+					<li><a href="mouseTrackingSet.html">Mouse Tracking</a></li>
+                    <li><a href="roundDrag.html">Circular Dragging</a></li>
+                    <li><a href="multMouseCircles.html">Multiple Circles with Tracking</a></li>
+                    <li><a href="movingObjects.html">Moving multiple objects</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="content">
+			<div class="container">
+				<div id="mn" class="main">
+					<h1>Canvas animation 1</h1>
+					<hr>
+
+					<!-- Canvas -->
+					<canvas id="myCanvas"> </canvas>
+					<hr>
+<script>
+    //to be updated
+    var width=0;
+    var height=0;
+    var cLeft=0;
+    var cTop=0;
+    var cRight=0;
+    var cBottom=0;
+    var xPos=0;
+    var yPos=0;
+    var positionString="";
+    
+    var canvas=document.getElementById("myCanvas");
+    var ctx=canvas.getContext("2d");
+    var requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame|| window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;
+    
+    //--
+
+  
+    function loader(){
+    reSizeCheck();
+    drawGrid(); 
+    runMain();
+    }
+   var count=0;
+    var counter=0;
+    var angle=0;
+    var rad=0;
+    function runMain(){
+        count+=1;
+        counter=count%100;
+        document.getElementById("out3").innerHTML=counter;
+        ctx.clearRect(0,0,width,height);
+        drawingFunctions();
+        requestAnimationFrame(runMain);
+    }
+    
+    function drawingFunctions(){
+        var xcPos=0.3*width;
+        var ycPos=0.3*height;
+        angle+=Math.PI/180;
+        rad=0.1*height*Math.abs(Math.cos(angle));
+        drawGrid();
+        circleMake(xcPos,ycPos,rad,true,false); 
+        var xDot=width/2+TrigLine(count,0.2*width,100,0);
+        var yDot=0.2*height+TrigLine(count,0.2*height,50,30);
+        circleMake(xDot,yDot,5,false, true);
+        rotateSquare(8*count);
+    }
+    
+    function circleMake(x,y,r,s,f){
+        ctx.beginPath();
+        ctx.arc(x,y,r, 0, Math.PI*2, true);
+        ctx.closePath();
+        ctx.lineWidth=2;
+        ctx.fillStyle="#228833";
+        ctx.strokeStyle="#dd0000";
+        if(s){ctx.stroke();}
+        if(f){ctx.fill();}
+    }
+    function TrigLine(x,a,b,t){
+        // a - maximum value
+        //b - period 0 to 0
+        //t -translation off 0
+        var temp=a*Math.asin(Math.cos(Math.PI*(x-b-t)/b))/Math.PI+a/2;
+        return temp;  
+    }
+    function rotateSquare(a){
+        //save canvas context
+        ctx.save();
+        ctx.translate(0.3*width,0.6*height);
+        ctx.rotate(a*Math.PI/180);
+        ctx.fillStyle="#00ff00";
+        ctx.fillRect(-25,-25,50,50);
+        // restore context
+        ctx.restore();
+    }
+     
+    function reSizeCheck(){
+        var rect=canvas.getBoundingClientRect();
+        cLeft=rect.left;
+        cTop=rect.top;
+        cRight=rect.right;
+        cBottom=rect.bottom;
+        positionString="Left: "+cLeft+" Top: "+cTop+" Right: "+cRight+" Bottom: "+cBottom;
+        document.getElementById("out1").innerHTML=positionString;
+        width=10*Math.floor(document.getElementById("mn").offsetWidth/10);
+        height=0.75*width;
+        canvas.width=width;
+        canvas.height=height;
+        drawGrid();
+        document.getElementById("out2").innerHTML="Width: "+width+" Height: "+height;
+    
+    }
+    //--
+    function drawGrid(){
+        ctx.fillStyle="#abaaee";
+        ctx.fillRect(0,0,width,height);
+        for(i=1;i<=9;i++){
+            var xcPos=(i/10)*width;
+            var ycPos=(i/10)*height;
+            ctx.fillStyle="#eeeeee";
+            ctx.fillRect(xcPos,0,1,height);
+            ctx.fillRect(0,ycPos,width,1);
+        }
+    }
+    
+    
+    //-- 
+</script>
+
+					<!-- Code -->
+					<p> Code snippets</p>
+                    <code>
+   function runMain(){<br>
+        count+=1;<br>
+        counter=count%100;<br>
+        ctx.clearRect(0,0,width,height);<br>
+        drawingFunctions();<br>
+        requestAnimationFrame(runMain);<br>
+    }<br><br>
+                    </code>
+                    <code>
+                           function drawingFunctions(){<br>
+        var xcPos=0.3*width;<br>
+        var ycPos=0.3*height;<br>
+        angle+=Math.PI/180;<br>
+        rad=0.1*height*Math.abs(Math.cos(angle));<br>
+        drawGrid();<br>
+        circleMake(xcPos,ycPos,rad,true,false); <br>
+        var xDot=width/2+TrigLine(count,0.2*width,100,0);<br>
+        var yDot=0.2*height+TrigLine(count,0.2*height,50,30);<br>
+        circleMake(xDot,yDot,5,false, true);<br>
+        rotateSquare(8*count);<br>
+    }<br><br>
+    
+    function circleMake(x,y,r,s,f){<br>
+        ctx.beginPath();<br>
+        ctx.arc(x,y,r, 0, Math.PI*2, true);<br>
+        ctx.closePath();<br>
+        ctx.lineWidth=2;<br>
+        ctx.fillStyle="#228833";<br>
+        ctx.strokeStyle="#dd0000";<br>
+        if(s){ctx.stroke();}<br>
+        if(f){ctx.fill();}<br>
+    }<br><br>
+    function TrigLine(x,a,b,t){<br>
+        // a - maximum value<br>
+        //b - period 0 to 0<br>
+        //t -translation off 0<br>
+        var temp=a*Math.asin(Math.cos(Math.PI*(x-b-t)/b))/Math.PI+a/2;<br>
+        return temp;<br>  
+    }<br><br>
+    function rotateSquare(a){<br>
+        //save canvas context<br>
+        ctx.save();<br>
+        ctx.translate(0.3*width,0.6*height);<br>
+        ctx.rotate(a*Math.PI/180);<br>
+        ctx.fillStyle="#00ff00";<br>
+        ctx.fillRect(-25,-25,50,50);<br>
+        // restore context<br>
+        ctx.restore();<br>
+    }<br>
+
+                    
+                    </code>
+					<hr>
+			
+				</div>
+				<div class="aside">
+					<h3>Data Output</h3>
+					<p id="out1"> </p>
+                    <p id="out2"> </p>
+                    <p id="out3"> </p>
+                    <p id="out4"> </p>
+				</div>
+			</div>
+		</div>
+		<div class="footer">
+			<div class="container">
+				&copy; Copyright 2015
+			</div>
+		</div>
+	</body>
+</html>

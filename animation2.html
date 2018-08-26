@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>HTML 5 Canvas studies - animation -unit circle</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="Description" lang="en" content="ADD SITE DESCRIPTION">
+		<meta name="author" content="ADD AUTHOR INFORMATION">
+		<meta name="robots" content="index, follow">
+
+		<!-- icons -->
+		<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+		<link rel="shortcut icon" href="favicon.ico">
+
+		<!-- Override CSS file - add your own CSS rules -->
+		<link rel="stylesheet" href="css/styles.css">
+        <script src="js/myScript.js"></script>
+	</head>
+	<body onload="loader()" onresize="reSizeCheck()" onscroll="reSizeCheck()">
+		<div class="header">
+			<div class="container">
+				<h1 class="header-heading">HTML 5 Canvas studies</h1>
+			</div>
+		</div>
+		<div class="nav-bar">
+			<div class="container">
+				<ul class="nav">
+					<li><a href="index.html">Basic set up</a></li>
+					<li><a href="animation1.html">Simple animations</a></li>
+					<li><a href="animation2.html">Unit circle</a></li>
+					<li><a href="mouseTrackingSet.html">Mouse Tracking</a></li>
+                    <li><a href="roundDrag.html">Circular Dragging</a></li>
+                    <li><a href="multMouseCircles.html">Multiple Circles with Tracking</a></li>
+                    <li><a href="movingObjects.html">Moving multiple objects</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="content">
+			<div class="container">
+				<div id="mn" class="main">
+					<h1>Canvas animation 2</h1>
+					<hr>
+
+					<!-- Canvas -->
+					<canvas id="myCanvas"> </canvas>
+					<hr>
+<script>
+    //to be updated
+ 
+	
+     var canvas=document.getElementById("myCanvas");
+    var ctx=canvas.getContext("2d");
+    var requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame|| window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;  
+  
+    
+    //--
+var tAngle=-1.125*Math.PI;
+var tSpeed=4;
+//boundaries of ball movement	
+var tLeft=0;
+var tRight=0;
+var tTop=0;
+var tBottom=0;
+// position of moving circle	
+var xBpos=0;
+var yBpos=0;
+// moving circle radius	
+var rad=10;
+// central ball radius (set in loader)
+var bRad=0;	
+//
+var linesOn=false;	
+//
+var go=true;	
+  
+    function loader(){
+    reSizeCheck();
+	xBpos=0.3*width;
+	yBpos=0.3*height;
+	tLeft=0.1*width;
+	tRight=0.9*width;
+	tTop=0.1*height;
+	tBottom=0.9*height;
+	bRad=0.1*width;	
+    drawGrid_param("#8888ff", "#333333"); 
+    runMain();
+    }
+	
+
+	
+   var count=0;
+   var counter=0;
+ 
+   
+	
+    function runMain(){
+        count+=1;
+        counter=count%100;
+        document.getElementById("out3").innerHTML=counter;
+		if(go){
+			ctx.clearRect(0,0,width,height);
+        	drawingFunctions();
+		}
+		requestAnimationFrame(runMain);
+    }
+    
+    function drawingFunctions(){
+        drawGrid_param("#8888ff", "#333333"); 
+		checker();
+		// moving circle
+		circleMake(xBpos,yBpos,rad,false,true,"#ff00ff","#000000");
+		// position of central circle
+		var xc=width/2;
+		var yc=height/2;
+		//central circle
+		circleMake(xc,yc, bRad, false, true,"#aa0033","#000000");
+		
+		var dist=distanceCheck(xc,yc,xBpos,yBpos);
+		document.getElementById("distance").innerHTML="Distance between points= "+rounder(dist,3);
+		// angle of line between ball and centre
+		var angle=angleCalculate(xc,yc,xBpos,yBpos);
+		document.getElementById("angle").innerHTML="Angle of line= "+rounder(angle*180/Math.PI,0);
+
+		var reflectAngle=2*angle-tAngle-Math.PI;
+		if(dist-rad<bRad){tAngle=reflectAngle;}
+		
+		
+		if(linesOn){
+		// draw the angle at the centre from 0 to radius line (connecting )
+		arcMake(xc,yc, 0.05*width,0,angle, true, true,"#ee0033","#ffffff");
+		// line between the two
+		drawLine(xc,yc,xBpos,yBpos,3, "#eeeeee");
+		var length=100;
+		
+		// positioning ball on the edge
+		var edgeX=xc+bRad*Math.cos(angle);
+		var edgeY=yc+bRad*Math.sin(angle);
+		circleMake(edgeX,edgeY, rad/2, false, true,"#ddffee","#000000");
+		//tangent line
+		drawLine(edgeX+bRad*Math.cos(angle+Math.PI/2), 
+				 edgeY+bRad*Math.sin(angle+Math.PI/2),
+				 edgeX-bRad*Math.cos(angle+Math.PI/2), 
+				 edgeY-bRad*Math.sin(angle+Math.PI/2),1,"#0000ff" );
+		// travel line
+		drawLine(edgeX+length*Math.cos(tAngle),
+				 edgeY+length*Math.sin(tAngle),
+				 edgeX-length*Math.cos(tAngle),
+				 edgeY-length*Math.sin(tAngle),1,"#ddeeff");
+		//drawLine(xBpos+length*Math.cos(tAngle),yBpos+length*Math.sin(tAngle),xBpos-length*Math.cos(tAngle),yBpos-length*Math.sin(tAngle),1,"#aaaaaa");
+		
+
+		// bounce line off edge circle
+		drawLine(edgeX+length*Math.cos(reflectAngle),
+				 edgeY+length*Math.sin(reflectAngle),
+				 edgeX-length*Math.cos(reflectAngle),
+				 edgeY-length*Math.sin(reflectAngle),1,"#aaeeff");
+		}
+    }
+// calculate angle of line between two points xs, ys is origin
+// plane is reflection on x-axis of Cartesian
+function angleCalculate(xs,ys,xf, yf){
+	var angle=0;
+	var xD=xf-xs;
+	var yD=yf-ys;
+	if(xD==0){
+		if(yf<ys){angle=3*Math.PI/2;}else{angle=Math.PI/2;}
+	}else{
+		var angle=Math.atan(yD/xD);
+	}
+	if(xf<xs){angle=angle+Math.PI;}
+	if(xf>xs && yf<ys){angle=angle+2*Math.PI;}
+	if(xD==0 && yD==0){angle=0;}
+	return angle;
+}
+	
+// calculate distance between 2 points
+function distanceCheck(xs,ys,xf,yf){
+var xDist=xs-xf;
+var yDist=ys-yf;
+var totalDist=Math.sqrt(Math.pow(xDist,2)+Math.pow(yDist,2));
+return totalDist;
+}
+// round a number n to d decimal places 
+function rounder(n,d){
+	var temp=n*Math.pow(10,d);
+	temp=Math.round(temp)/Math.pow(10,d);
+	return temp;
+}
+
+function drawLine(xs,ys,xf,yf, w,s){
+	ctx.beginPath();
+	ctx.lineWidth=w;
+	ctx.moveTo(xs,ys);
+	ctx.lineTo(xf,yf);
+	ctx.strokeStyle=s;
+	ctx.stroke();
+}
+	
+function circleMake(x,y,r,s,f,fs,ss){
+	ctx.beginPath();
+	ctx.arc(x,y,r, 0, Math.PI*2, true);
+	ctx.closePath();
+	ctx.lineWidth=1;
+	ctx.fillStyle=fs;
+	ctx.strokeStyle=ss;
+	if(s){ctx.stroke();}
+	if(f){ctx.fill();}
+}
+	
+function arcMake(x,y,r,starta,enda,s,f,fs,ss){
+	ctx.beginPath();
+	ctx.moveTo(x,y);
+	ctx.arc(x,y,r, starta, enda, false);
+	ctx.lineTo(x,y);
+	ctx.lineWidth=1;
+	ctx.fillStyle=fs;
+	ctx.strokeStyle=ss;
+	if(s){ctx.stroke();}
+	if(f){ctx.fill();}
+}	
+
+	// check bounds and change ball direction
+function checker(){
+	if(yBpos<rad+tTop||yBpos>tBottom-rad){
+	tAngle=2*Math.PI-tAngle;
+	}
+	if(xBpos<rad+tLeft||xBpos>tRight-rad){
+	tAngle=Math.PI-tAngle;
+	}
+	yBpos+=tSpeed*Math.sin(tAngle);
+	xBpos+=tSpeed*Math.cos(tAngle);
+	document.getElementById("tAngle").innerHTML="Travel angle "+rounder(tAngle*180/Math.PI,0)+" = "+rounder(tAngle*180/Math.PI,0)%360;
+}
+ 
+     
+    
+    //--
+ function rollover(id){
+document.getElementById(id).style.background="#3399ff";
+}
+function rollout(id){
+document.getElementById(id).style.background="#aa99ff";
+}
+function setLines(){
+	if(linesOn){linesOn=false;}else{linesOn=true;}
+}
+function stopStart(id){
+	if(go){
+		go=false;
+		document.getElementById(id).innerHTML="Start Animation"; }else{
+		go=true;
+		document.getElementById(id).innerHTML="Stop Animation";
+		}
+}
+function changeSpeed(a){
+	tSpeed=a*1;
+}	
+    
+    
+    //-- 
+</script>
+
+					<!-- Code -->
+					<p> Code snippets</p>
+                    <code>
+// check bounds and change ball direction<br>
+function checker(){<br>
+	if(yBpos &lt rad+tTop||yBpos &gt tBottom-rad){<br>
+	tAngle=2*Math.PI-tAngle;<br>
+	}<br>
+	if(xBpos &lt rad+tLeft||xBpos &gt tRight-rad){<br>
+	tAngle=Math.PI-tAngle;<br>
+	}<br>
+	yBpos+=tSpeed*Math.sin(tAngle);<br>
+	xBpos+=tSpeed*Math.cos(tAngle);<br>
+}<br>
+<br><br>
+                    </code>
+                    <code>
+   function drawingFunctions(){<br>
+   drawGrid_param("#8888ff", "#333333");<br> 
+	checker();<br>
+	// moving circle<br>
+	circleMake(xBpos,yBpos,rad,false,true,"#ff00ff","#000000");<br>
+	// position of central circle<br>
+	var xc=width/2;<br>
+	var yc=height/2;<br>
+	//central circle<br>
+	circleMake(xc,yc, bRad, false, true,"#aa0033","#000000");<br>
+	var dist=distanceCheck(xc,yc,xBpos,yBpos);<br>
+	// angle of line between ball and centre<br>
+	var angle=angleCalculate(xc,yc,xBpos,yBpos);<br>
+	var reflectAngle=2*angle-tAngle-Math.PI;<br>
+		if(dist-rad &lt bRad){tAngle=reflectAngle;}<br>
+		...<br>				
+    }<br><br>
+    
+// calculate angle of line between two points xs, ys is origin<br>
+// plane is reflection on x-axis of Cartesian<br>
+function angleCalculate(xs,ys,xf, yf){<br>
+	var angle=0;<br>
+	var xD=xf-xs;<br>
+	var yD=yf-ys;<br>
+	if(xD==0){<br>
+		if(yf &lt ys){angle=3*Math.PI/2;}else{angle=Math.PI/2;}<br>
+	}else{<br>
+		var angle=Math.atan(yD/xD);<br>
+	}<br>
+	if(xf &lt xs){angle=angle+Math.PI;}<br>
+	if(xf &gt xs && yf &lt ys){angle=angle+2*Math.PI;}<br>
+	if(xD==0 && yD==0){angle=0;}<br>
+	return angle;<br>
+}<br><br>
+	
+// calculate distance between 2 points<br>
+function distanceCheck(xs,ys,xf,yf){<br>
+var xDist=xs-xf;<br>
+var yDist=ys-yf;<br>
+var totalDist=Math.sqrt(Math.pow(xDist,2)+Math.pow(yDist,2));<br>
+return totalDist;<br>
+}<br>
+// round a number n to d decimal places <br>
+function rounder(n,d){<br>
+	var temp=n*Math.pow(10,d);<br>
+	temp=Math.round(temp)/Math.pow(10,d);<br>
+	return temp;<br>
+}<br><br>
+
+                    
+                    </code>
+					<hr>
+			
+				</div>
+				<div class="aside">
+					<h3>Data Output</h3>
+					<p id="out1"> </p>
+                    <p id="out2"> </p>
+                    <p id="out3"> </p>
+                    <p id="distance"> </p>
+					<p id="angle"> </p>
+					<p id="tAngle"> </p>
+					<button id="extras" class="btn" type="button" onmouseover="rollover(id)" onmouseout="rollout(id)" onclick="setLines()">Lines on</button>
+					<button id="stopAn" class="btn" type="button" onmouseover="rollover(id)" onmouseout="rollout(id)" onclick="stopStart(id)">Stop Animation</button><div class="combo">Set Speed</div>
+					 <select class="combo" onchange="changeSpeed(this.value)">
+						<option value="-2">-2</option>
+  						<option value="-1">-1</option>
+  						<option value="0">0</option>
+  						<option value="1">1</option>
+  						<option value="2">2</option>
+  						<option value="3">3</option>
+  						<option value="4" selected>4</option>
+						<option value="5">5</option>
+  						<option value="6">6</option> 
+					</select> 
+				</div>
+			</div>
+		</div>
+		<div class="footer">
+			<div class="container">
+				&copy; Copyright 2015
+			</div>
+		</div>
+	</body>
+</html>

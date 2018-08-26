@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>HTML 5 Canvas studies - multiple circles</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="Description" lang="en" content="ADD SITE DESCRIPTION">
+		<meta name="author" content="ADD AUTHOR INFORMATION">
+		<meta name="robots" content="index, follow">
+
+		<!-- icons -->
+		<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+		
+
+		<!-- Override CSS file - add your own CSS rules -->
+		<link rel="stylesheet" href="css/styles.css">
+
+	</head>
+<body>
+	<!-- -->	
+	<div class="header">
+			<div class="container">
+				<h1 class="header-heading">HTML 5 Canvas studies</h1>
+			</div>
+		</div>
+	<!-- -->
+		<div class="nav-bar">
+			<div class="container">
+				<ul class="nav">
+				<li><a href="index.html">Basic set up</a></li>
+					<li><a href="animation1.html">Simple animations</a></li>
+					<li><a href="animation2.html">Unit circle</a></li>
+					<li><a href="mouseTrackingSet.html">Mouse Tracking</a></li>
+                    <li><a href="roundDrag.html">Circular Dragging</a></li>
+                    <li><a href="multMouseCircles.html">Multiple Circles with Tracking</a></li>
+                    <li><a href="movingObjects.html">Moving multiple objects</a></li>
+				</ul>
+			</div>
+		</div>
+	<!-- -->
+		<div class="content">
+			<div class="container">
+				<div id="mn" class="main">
+					<h1>Multiple Circles</h1>
+					<hr>
+
+					<!-- Canvas -->
+					<canvas id="myCanvas"> </canvas>
+
+					<hr>
+					<p>Code Snippet</p>
+					<code>
+						
+var canvas = document.querySelector('canvas');<br>
+var width = 10*Math.floor(document.getElementById("mn").offsetWidth/10);<br>
+var height = 0.75*10*Math.floor(width/10);<br>
+canvas.width = width;<br>
+canvas.height = height;<br>
+var c = canvas.getContext('2d');<br><br>
+
+//--------------- arrays and variables<br>
+   //distance from mouse<br> 
+var dist = 50;<br>
+var colourA1 = [ '#A44365', '#EDAC52', '#315054', '#D74C41', '#302E49'];<br>
+var colourA2 = ['#333333', '#999999', '#bbbbbb' , '#dddddd', '#ffffff'];<br>
+var colourArray = colourA2;<br>
+var maxRadius = 40;<br>
+var circleArray = [];<br>
+
+var mouse = {<br>
+	x: undefined,<br>
+	y: undefined<br>
+}<br><br>
+
+//----------- listeners<br>
+window.addEventListener('load',<br>
+					  function(){<br>
+	document.getElementById("dims").innerHTML="Canvas: width= "+width+" , height= "+height;<br>
+} );<br><br>
+window.addEventListener('resize',<br>
+					   function() {<br>
+	width = 10*Math.floor(document.getElementById("mn").offsetWidth/10);<br>
+	height = 0.75*10*Math.floor(width/10); <br>
+	canvas.width = width; <br>
+	canvas.height = height; <br>
+	document.getElementById("dims").innerHTML="Canvas: width= "+width+" , height= "+height; <br>
+} ); <br><br>
+
+canvas.addEventListener('mousemove', <br>
+					   function(event){ <br>
+	mouse.x = event.offsetX; <br>
+	mouse.y = event.offsetY; <br>
+	document.getElementById("mousePos").innerHTML = "x mouse = " + mouse.x + " y mouse = "+ mouse.y; <br>
+}); <br><br>
+
+canvas.addEventListener('mouseleave', <br>
+					   function(){ <br>
+	
+	mouse.x = -1000; <br>
+	mouse.y = -1000; <br>
+	document.getElementById("mousePos").innerHTML = "x mouse = " + mouse.x + " y mouse = "+ mouse.y; <br>
+	
+}); <br><br>
+
+
+//--------------objects <br>
+function Circle(x,y,dx,dy,radius){ <br>
+	//constructors <br>
+	this.x = x; <br>
+	this.y = y; <br>
+	this.dx = dx; <br>
+	this.dy = dy; <br>
+	this.radius = radius; <br>
+	this.minRadius = radius; <br>
+	this.colour=colourArray[Math.floor(Math.random()*colourArray.length)]; <br>
+	//methods <br>
+	this.draw = function() { <br>
+		c.beginPath(); <br>
+		c.arc(this.x,this.y,this.radius,0, Math.PI*2, false); <br>
+		c.strokeStyle = 'rgba(255,255,0,0.5)'; <br>
+		c.fillStyle = this.colour; <br>
+		c.fill(); <br>	
+	}<br>
+	// motion <br>
+	this.update = function() { <br>
+		if (this.x + this.radius > width || this.x - this.radius &lt 0){ <br>
+			this.dx = -this.dx; <br>
+		} <br>
+		if (this.y + this.radius > height || this.y - this.radius &lt 0){ <br>
+			this.dy = -this.dy; <br>
+		} <br>
+		
+		this.x += this.dx; <br>
+		this.y += this.dy; <br>
+	
+		if( Math.abs(mouse.x-this.x) &lt dist && Math.abs(mouse.y - this.y) &lt dist ){ <br>
+			if(this.radius &lt maxRadius){this.radius += 1 ;} <br>
+			
+		}else if (this.radius &gt this.minRadius ){ <br>
+			this.radius -= 1; <br>
+		} <br>
+		
+		this.draw(); <br>
+	} <br>
+}<br><br>
+
+
+//-------------general functions <br>
+function drawGrid_param(f, g ){ <br>
+        c.fillStyle=f; <br>
+        c.fillRect(0,0,width,height); <br>
+        for(i=1;i &lt =9;i++){ <br>
+            var xcPos=(i/10)*width; <br>
+            var ycPos=(i/10)*height; <br>
+            c.fillStyle=g; <br>
+            c.fillRect(xcPos,0,1,height); <br>
+            c.fillRect(0,ycPos,width,1); <br>
+        } <br>
+    } <br><br>
+//----------------object instatiation <br>
+for ( var i = 0 ; i &lt 300 ; i++ ){ <br>
+	var radius = Math.round(Math.random()*5+1); <br>
+	var x = radius+Math.random()*(width-radius*2); <br>
+	var dx = (Math.random()-0.5)*1; <br>
+	var y = radius+Math.random()*(height-radius*2); <br>
+	var dy = (Math.random()-0.5)*1; <br>
+	//<br>
+	circleArray.push(new Circle(x,y, dx, dy,radius)); <br>
+	
+}<br><br>
+
+
+
+
+function drawingFunctions(){ <br>
+	drawGrid_param('rgb(240,240,240)','rgb(255,200,0)'); <br>
+	for (var i = 0; i &lt  circleArray.length ; i++){ <br>
+		circleArray[i].update(); <br>
+	} <br>
+} <br><br>
+
+var count = 0; <br>
+var counter = 0; <br>
+function animate() { <br>
+	count += 1; <br>
+	counter = count % 100; <br>
+	document.getElementById("countOut").innerHTML = counter; <br>
+	requestAnimationFrame(animate); <br>
+	c.clearRect(0,0,width,height); <br>
+	drawingFunctions(); <br>
+} <br>
+animate(); <br>
+
+
+					
+					</code>
+
+					
+					<hr>
+			
+				</div>
+				<div class="aside">
+					<h3>Data Output</h3>
+					<p id="dims"> </p>
+                    <p id="countOut"> </p>
+                    <p id="out3"> </p>
+					<p id="mousePos"> </p>
+
+					</div>
+			</div>
+		</div>
+		<div class="footer">
+			<div class="container">
+				&copy; Copyright 2015
+			</div>
+		</div>
+<script type="text/javascript" src="js/summary.js"></script>
+	</body>
+</html>
